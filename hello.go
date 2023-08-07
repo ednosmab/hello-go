@@ -2,50 +2,53 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 )
 
 func main() {
-	nome := solicitaNome()
-	exibeIntroducao(nome)
-	exibeOpcoes(nome)
+	name := requestName()
+	displayIntroduction(name)
+	for {
+		displayOptions(name)
 
-	solicitaOpcao()
+		requestOption()
+	}
 }
 
-func informeNome() {
+func informName() {
 	fmt.Println("Informe o seu nome")
 }
-func solicitaNome() string {
-	var nome string
-	informeNome()
-	fmt.Scan(&nome)
-	return nome
+func requestName() string {
+	var name string
+	informName()
+	fmt.Scan(&name)
+	return name
 }
-func exibeIntroducao(nome string) {
-	versao := 1.1
-	fmt.Println("Bem vindo ao Go World,", nome)
-	fmt.Println("Este programa está na versão", versao)
+func displayIntroduction(name string) {
+	version := 1.1
+	fmt.Println("Bem vindo ao Go World,", name)
+	fmt.Println("Este programa está na versão", version)
 }
 
-func exibeOpcoes(nome string) {
-	fmt.Println(nome, "informe a opção desejada:")
+func displayOptions(name string) {
+	fmt.Println(name, "informe a opção desejada:")
 	fmt.Println("1- Iniciar Monitoramento")
 	fmt.Println("2- Exibir Log")
 	fmt.Println("0- Sair do Programa")
 }
 
-func informeOpcao() int {
+func informOption() int {
 	var comando int
 	fmt.Scan(&comando)
 	return comando
 }
 
-func solicitaOpcao() {
-	comando := informeOpcao()
-	switch comando {
+func requestOption() {
+	command := informOption()
+	switch command {
 	case 1:
-		fmt.Println("Monitorando...")
+		startMonitoring()
 	case 2:
 		fmt.Println("Exibindo logs...")
 	case 0:
@@ -55,4 +58,23 @@ func solicitaOpcao() {
 		fmt.Println("Não conheço este comando!")
 		os.Exit(-1)
 	}
+}
+
+func requestSite() string {
+	fmt.Println("Informe o site a ser verificado:")
+	var site string
+	fmt.Scan(&site)
+	return site
+}
+func getStatusCode(site string) int {
+	resp, _ := http.Get(site)
+	return resp.StatusCode
+}
+
+func startMonitoring() {
+	site := requestSite()
+	if getStatusCode(site) != 200 {
+		fmt.Println("Site verificado:", site, "Não foi carregado com sucesso")
+	}
+	fmt.Println("Site verificado:", site, "Carregado com sucesso!")
 }
