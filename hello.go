@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
+
+const monitorings = 5
+const delay = 3
+const delayMessage = 1
 
 func main() {
 	name := requestName()
@@ -27,7 +32,7 @@ func requestName() string {
 }
 func displayIntroduction(name string) {
 	version := 1.1
-	fmt.Println("Bem vindo ao Go World,", name)
+	fmt.Println("Bem vindo ao Site Monitor,", name)
 	fmt.Println("Este programa está na versão", version)
 }
 
@@ -71,10 +76,43 @@ func getStatusCode(site string) int {
 	return resp.StatusCode
 }
 
-func startMonitoring() {
-	site := requestSite()
+func allSites() []string {
+	sites := []string{
+		"https://www.google.com.br",
+		"https://www.casadocodigo.com.br/",
+		"http://alura.com.br/",
+	}
+
+	return sites
+}
+
+func siteValidate(site string) {
 	if getStatusCode(site) != 200 {
 		fmt.Println("Site verificado:", site, "Não foi carregado com sucesso")
 	}
-	fmt.Println("Site verificado:", site, "Carregado com sucesso!")
+	fmt.Println("Site verificado:", site)
+	fmt.Println("Status: carregado com sucesso!")
+}
+func processSite() {
+	sites := allSites()
+	for i := 0; i < monitorings; i++ {
+		for _, site := range sites {
+			siteValidate(site)
+		}
+		fmt.Println("")
+		time.Sleep(delay * time.Second)
+	}
+	fmt.Println("-----------Menu de opções------------")
+}
+func startMessage() {
+	fmt.Println("")
+	fmt.Print("Monitorando ")
+	for i := 0; i < 3; i++ {
+		fmt.Print(".")
+		time.Sleep(delayMessage * time.Second)
+	}
+}
+func startMonitoring() {
+	startMessage()
+	processSite()
 }
