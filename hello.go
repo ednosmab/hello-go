@@ -12,13 +12,14 @@ const delay = 3
 const delayMessage = 1
 
 func main() {
-	name := requestName()
-	displayIntroduction(name)
-	for {
-		displayOptions(name)
+	leArquivoExterno()
+	// name := requestName()
+	// displayIntroduction(name)
+	// for {
+	// 	displayOptions(name)
 
-		requestOption()
-	}
+	// 	requestOption()
+	// }
 }
 
 func informName() {
@@ -72,7 +73,11 @@ func requestSite() string {
 	return site
 }
 func getStatusCode(site string) int {
-	resp, _ := http.Get(site)
+	resp, err := http.Get(site)
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
 	return resp.StatusCode
 }
 
@@ -115,4 +120,13 @@ func startMessage() {
 func startMonitoring() {
 	startMessage()
 	processSite()
+}
+
+func leArquivoExterno() {
+	arquivo, err := os.Open("sites.txt")
+	if err != nil {
+		fmt.Println("Ocorreu um erro: ", err)
+		return
+	}
+	fmt.Println(arquivo)
 }
