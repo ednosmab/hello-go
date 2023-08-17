@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,7 +16,6 @@ const delay = 3
 const delayMessage = 1
 
 func main() {
-
 	name := requestName()
 
 	displayIntroduction(name)
@@ -25,6 +25,10 @@ func main() {
 
 		requestOption()
 	}
+}
+
+func messageMenu() {
+	fmt.Println("-----------Menu de opções------------")
 }
 
 func informName() {
@@ -66,7 +70,7 @@ func requestOption() {
 	case 1:
 		startMonitoring()
 	case 2:
-		fmt.Println("Exibindo logs...")
+		displayLogs()
 	case 0:
 		fmt.Println("Saindo do programa")
 		os.Exit(0)
@@ -98,15 +102,18 @@ func getStatusCode(site string) int {
 func siteValidate(site string) {
 	if getStatusCode(site) != 200 {
 		fmt.Println("Site verificado:", site, "Não foi carregado com sucesso")
+		logRecord(site, false)
+
 	} else {
 		fmt.Println("Site verificado:", site)
 		fmt.Println("Status: carregado com sucesso!")
+		logRecord(site, true)
 	}
 
 }
 
 func processSite() {
-	sites := readExternalFile()
+	sites := readExternalFile("sites.txt")
 	fmt.Println(sites)
 	for i := 0; i < monitoring; i++ {
 		if len(sites) == 0 {
@@ -119,12 +126,12 @@ func processSite() {
 		time.Sleep(delay * time.Second)
 	}
 
-	fmt.Println("-----------Menu de opções------------")
+	messageMenu()
 }
 
-func startMessage() {
+func startMessage(option string) {
 	fmt.Println("")
-	fmt.Print("Monitorando ")
+	fmt.Print(option, " ")
 
 	for i := 0; i < 3; i++ {
 		fmt.Print(".")
@@ -132,9 +139,9 @@ func startMessage() {
 	}
 }
 
-func readExternalFile() []string {
+func readExternalFile(fileToRead string) []string {
 	lines := []string{}
-	file, err := os.Open("sites.txt")
+	file, err := os.Open(fileToRead)
 	reader := bufio.NewReader(file)
 
 	if err != nil {
@@ -158,7 +165,35 @@ func readExternalFile() []string {
 	return lines
 }
 
+func logRecord(site string, status bool) {
+	file, err := os.OpenFile("log.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	file.WriteString("[ " + time.Now().Format("02/01/2006 15:04:05") + " ] -- " + site + " -- online: " + strconv.FormatBool(status) + "\n")
+
+	file.Close()
+
+}
+
 func startMonitoring() {
-	startMessage()
+	startMessage("Monitorando")
 	processSite()
+}
+
+func readExternalLog(fileToRead string) {
+	file, err := os.ReadFile("log.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(file))
+
+	messageMenu()
+}
+func displayLogs() {
+	startMessage("Exibindo logs")
+	readExternalLog("log.txt")
+
 }
