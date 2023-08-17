@@ -1,4 +1,4 @@
-"www.google.com.br"
-"www.casadocodigo.com.br"
-"www.lura.com.br"
-"www.testei.com.br"
+www.google.com.br
+www.casadocodigo.com.br
+www.lura.com.br
+www.testei.com.br
